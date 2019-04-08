@@ -1,4 +1,4 @@
-
+import datetime
 class Model:
 
 	MOCK_USERS = [{"email": "test@example.com", "salt":
@@ -8,6 +8,9 @@ class Model:
 	
 	MOCK_TABLES = [{"_id": "1", "number": "1", "owner":
 					"test@example.com","url": "mockurl"}]
+
+	MOCK_REQUESTS = [{"_id": "1", "table_number": "1","table_id": "1",
+					  "time": datetime.datetime.now()}]
 
 	def get_user(self, email):
 		user = [x for x in self.MOCK_USERS if x.get("email") == email]
@@ -29,10 +32,24 @@ class Model:
 				break
 
 	def get_tables(self, owner_id):
-		return self.MOCK_TABLES
+		return [table for table in self.MOCK_TABLES if table['owner'] == owner_id]
 
 	def delete_table(self, table_id):
 		for i, table in enumerate(self.MOCK_TABLES):
 			if table.get("_id") == table_id:
 				del self.MOCK_TABLES[i]
+				break
+
+	def add_request(self, table_id, time):
+		self.MOCK_REQUESTS.append({"_id": table_id, "table_number": table_id, 
+		"table_id": table_id, "time": time})
+		return  table_id
+
+	def get_requests(self, owner_id):
+		return self.MOCK_REQUESTS
+
+	def delete_request(self, request_id):
+		for i, req in enumerate(self.MOCK_REQUESTS):
+			if req['_id'] == request_id:
+				del self.MOCK_REQUESTS[i]
 				break
