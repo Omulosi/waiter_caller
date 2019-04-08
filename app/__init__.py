@@ -3,6 +3,7 @@ from flask_login import LoginManager
 from config import Config
 
 login_manager = LoginManager()
+login_manager.login_view = 'main.home'
 
 def create_app(config=Config):
 

@@ -1,8 +1,8 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import SubmitField, TextField
 from wtforms import validators
 
-class CreateTableForm(Form):
+class CreateTableForm(FlaskForm):
     tablenumber = TextField('tablenumber',
                             validators=[validators.DataRequired()])
     submit = SubmitField('createtablesubmit',

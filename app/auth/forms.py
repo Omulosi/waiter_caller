@@ -1,11 +1,11 @@
 
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import PasswordField, SubmitField
 from wtforms.fields.html5 import EmailField
 from wtforms import validators
 
 
-class RegistrationForm(Form):
+class RegistrationForm(FlaskForm):
     email = EmailField('email', validators=[validators.DataRequired(), validators.Email()])
     password = PasswordField('password',
                             validators=[validators.DataRequired(),
@@ -17,7 +17,7 @@ class RegistrationForm(Form):
                                                 message='Passwords must match')])
     submit = SubmitField('submit', [validators.DataRequired()])
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     loginemail = EmailField('email',
                             validators=[validators.DataRequired(), validators.Email()])
     loginpassword = PasswordField('password',

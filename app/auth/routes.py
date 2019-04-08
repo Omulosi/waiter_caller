@@ -1,11 +1,17 @@
 from flask import render_template, redirect, url_for, request
 from flask_login import login_required, login_user, logout_user
 from ..user import User
-from ..models import Model as DBHelper
 from . import bp
 from app import login_manager
 from .utils import PasswordHelper
 from .forms import RegistrationForm, LoginForm
+from config import Config
+
+if Config.TEST:
+    from ..mock_models import Model as DBHelper
+else:
+    from ..models import Model as DBHelper
+
 
 DB = DBHelper()
 PH = PasswordHelper()

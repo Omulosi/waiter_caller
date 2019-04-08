@@ -1,55 +1,45 @@
 import datetime
+import pymongo
+from bson.objectid import ObjectId
+
+DATABASE = "waitercaller"
+
 class Model:
 
-	MOCK_USERS = [{"email": "test@example.com", "salt":
-			   "8Fb23mMNHD5Zb8pr2qWA3PE9bH0=", "hashed":
-			   "1736f83698df3f8153c1fbd6ce2840f8aace4f200771a46672635374073cc876c"
-			   "f0aa6a31f780e576578f791b5555b50df46303f0c3a7f2d21f91aa1429ac22e"}]
-	
-	MOCK_TABLES = [{"_id": "1", "number": "1", "owner":
-					"test@example.com","url": "mockurl"}]
-
-	MOCK_REQUESTS = [{"_id": "1", "table_number": "1","table_id": "1",
-					  "time": datetime.datetime.now()}]
+	def __init__(self):
+		client = pymongo.MongoClient()
+		self.db = client[DATABASE]
 
 	def get_user(self, email):
-		user = [x for x in self.MOCK_USERS if x.get("email") == email]
-		if user:
-			return user[0]
-		return None
+		return self.db.users.find_one({"email": email})
 
 	def add_user(self, email, salt, hashed):
-		self.MOCK_USERS.append({"email": email, "salt": salt, "hashed": hashed})
+		self.db.users.insert({"email": email, "salt": salt, "hashed": hashed})
 
 	def add_table(self, number, owner):
-		self.MOCK_TABLES.append({"_id": number, "number": number, "owner": owner})
-		return number
+		new_id = self.db.tables.insert({"number": number, "owner": owner})
+		return new_id
 
 	def update_table(self, _id, url):
-		for table in self.MOCK_TABLES:
-			if table.get("_id") == _id:
-				table['url'] = url
-				break
+		self.db.tables.update({"_id": _id}, {"$set": {"url": url}})
 
 	def get_tables(self, owner_id):
-		return [table for table in self.MOCK_TABLES if table['owner'] == owner_id]
+		return list(self.db.tables.find({"owner": owner_id}))
+
+	def get_table(self, owner_id):
+		return self.db.tables.find_one({"_id": ObjectId(owner_id)})
 
 	def delete_table(self, table_id):
-		for i, table in enumerate(self.MOCK_TABLES):
-			if table.get("_id") == table_id:
-				del self.MOCK_TABLES[i]
-				break
+		self.db.tables.remove({"_id": ObjectId(table_id)})
 
 	def add_request(self, table_id, time):
-		self.MOCK_REQUESTS.append({"_id": table_id, "table_number": table_id, 
+		table = self.get_table(table_id)
+		self.db.requests.insert({"owner": table['owner'], "table_number": table['number'], 
 		"table_id": table_id, "time": time})
 		return  table_id
 
 	def get_requests(self, owner_id):
-		return self.MOCK_REQUESTS
+		return list(self.db.requests.find({"owner": owner_id}))
 
 	def delete_request(self, request_id):
-		for i, req in enumerate(self.MOCK_REQUESTS):
-			if req['_id'] == request_id:
-				del self.MOCK_REQUESTS[i]
-				break
+		self.db.requests.remove({"_id": ObjectId(request_id)})
