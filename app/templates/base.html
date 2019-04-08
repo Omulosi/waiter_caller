@@ -25,6 +25,15 @@
 			padding: 0;
 			color: red;
 			}
+
+			.user-nav {
+				position: relative;			
+			}
+
+			.logout-btn {
+				position: absolute;
+				right: 0;
+			}
 		</style>
 	</head>
 	{% block bodytag %}
@@ -33,10 +42,12 @@
 		{% block navbar %}
 		<nav class="navbar navbar-inverse navbar-fixed-top navbar-dark bg-dark">
 			<div class="container">
-				<div class="navbar-header">
+				<div class="navbar-header user-nav">
 					<a class="navbar-brand" href="/dashboard">Dashboard</a>
-					<a class="navbar-brand" href="/account">Account</a>
+					<a class="navbar-brand" href="/account">Account</a>	
 				</div>
+				<a href="{{url_for('auth.logout')}}" class="btn btn-outline-success d-inline-flex"
+				>Log Out</a>
 			</div>
 		</nav>
 		{% endblock %}
