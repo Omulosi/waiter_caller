@@ -6,19 +6,23 @@ from . import bp
 from ..models import Model as DBHelper
 from .utils import BitlyHelper
 from config import Config
+from ..auth.forms import RegistrationForm, LoginForm
+from .forms import CreateTableForm
 
 DB = DBHelper()
 BH = BitlyHelper()
 
 @bp.route('/')
 def home():
-    return render_template('home.html')
+    registrationform = RegistrationForm()
+    return render_template('home.html', registrationform=registrationform, loginform=LoginForm())
 
 @bp.route('/account')
 @login_required
 def account():
     tables = DB.get_tables(current_user.get_id())
-    return render_template('account.html', tables=tables)
+    return render_template("account.html",
+                            createtableform=CreateTableForm(), tables=tables)
 
 @bp.route('/dashboard')
 @login_required
@@ -35,12 +39,18 @@ def dashboard():
 @bp.route('/account/createtable', methods=('POST',))
 @login_required
 def account_createtable():
-    tablename = request.form.get('tablenumber')
-    tableid = DB.add_table(tablename, current_user.get_id())
-    new_url = Config.BASE_URL + "newrequest/" + tableid
-    new_url = BH.shorten_url(new_url)
-    DB.update_table(tableid, new_url)
-    return redirect(url_for('main.account'))
+    form = CreateTableForm(request.form)
+
+    if form.validate():
+        tableid = DB.add_table(form.tablenumber.data,
+        current_user.get_id())
+        new_url = Config.BASE_URL + "newrequest/" + tableid
+        new_url = BH.shorten_url(new_url)
+        DB.update_table(tableid, new_url)
+        return redirect(url_for('main.account'))
+    return render_template("account.html", createtableform=form,
+    tables=DB.get_tables(current_user.get_id()))
+
 
 @bp.route('/account/deletetable')
 @login_required
